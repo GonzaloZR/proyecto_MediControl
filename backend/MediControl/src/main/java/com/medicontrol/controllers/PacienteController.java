@@ -1,7 +1,9 @@
 package com.medicontrol.controllers;
 
-import com.medicontrol.model.Paciente;
+import com.medicontrol.dto.paciente.PacienteDTO;
+import com.medicontrol.dto.paciente.PacienteRequest;
 import com.medicontrol.service.PacienteService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,23 +20,26 @@ public class PacienteController {
     }
 
     @GetMapping
-    public List<Paciente> listarPacientes() {
+    public List<PacienteDTO> listarPacientes() {
         return pacienteService.listarPacientes();
     }
 
     @GetMapping("/{id}")
-    public Paciente buscarPorId(@PathVariable Long id) {
+    public PacienteDTO buscarPorId(@PathVariable Long id) {
         return pacienteService.buscarPorId(id);
     }
 
     @PostMapping
-    public Paciente registrarPaciente(@RequestBody Paciente paciente) {
-        return pacienteService.registrarPaciente(paciente);
+    public PacienteDTO registrarPaciente(@Valid @RequestBody PacienteRequest request) {
+        return pacienteService.registrarPaciente(request);
     }
 
     @PutMapping("/{id}")
-    public Paciente actualizarPaciente(@PathVariable Long id, @RequestBody Paciente paciente) {
-        return pacienteService.actualizarPaciente(id, paciente);
+    public PacienteDTO actualizarPaciente(
+            @PathVariable Long id,
+            @Valid @RequestBody PacienteRequest request
+    ) {
+        return pacienteService.actualizarPaciente(id, request);
     }
 
     @DeleteMapping("/{id}")

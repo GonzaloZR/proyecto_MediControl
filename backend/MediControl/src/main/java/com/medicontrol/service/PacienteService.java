@@ -1,18 +1,19 @@
 package com.medicontrol.service;
 
-import com.medicontrol.model.Paciente;
+import com.medicontrol.dto.paciente.PacienteDTO;
+import com.medicontrol.dto.paciente.PacienteRequest;
 
 import java.util.List;
 
 public interface PacienteService {
 
-    List<Paciente> listarPacientes();
+    List<PacienteDTO> listarPacientes();
 
-    Paciente buscarPorId(Long id);
+    PacienteDTO buscarPorId(Long id);
 
-    Paciente registrarPaciente(Paciente paciente);
+    PacienteDTO registrarPaciente(PacienteRequest request);
 
-    Paciente actualizarPaciente(Long id, Paciente paciente);
+    PacienteDTO actualizarPaciente(Long id, PacienteRequest request);
 
     void eliminarPaciente(Long id);
 }

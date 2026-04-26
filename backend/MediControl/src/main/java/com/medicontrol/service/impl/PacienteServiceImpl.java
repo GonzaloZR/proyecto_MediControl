@@ -4,6 +4,9 @@ import com.medicontrol.model.Paciente;
 import com.medicontrol.repository.PacienteRepository;
 import com.medicontrol.service.PacienteService;
 import org.springframework.stereotype.Service;
+import com.medicontrol.dto.paciente.PacienteDTO;
+import com.medicontrol.dto.paciente.PacienteRequest;
+import com.medicontrol.mapper.PacienteMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,61 +21,58 @@ public class PacienteServiceImpl implements PacienteService {
     }
 
     @Override
-    public List<Paciente> listarPacientes() {
+    public List<PacienteDTO> listarPacientes() {
         return pacienteRepository.findAll()
                 .stream()
-                .filter(paciente -> Boolean.TRUE.equals(paciente.getEstado()))
+                .filter(p -> Boolean.TRUE.equals(p.getEstado()))
+                .map(PacienteMapper::toDTO)
                 .toList();
     }
 
     @Override
-    public Paciente buscarPorId(Long id) {
-        return pacienteRepository.findById(id)
-                .filter(paciente -> Boolean.TRUE.equals(paciente.getEstado()))
+    public PacienteDTO buscarPorId(Long id) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .filter(p -> Boolean.TRUE.equals(p.getEstado()))
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
+        return PacienteMapper.toDTO(paciente);
     }
 
     @Override
-    public Paciente registrarPaciente(Paciente paciente) {
-        pacienteRepository.findByDni(paciente.getDni()).ifPresent(p -> {
+    public PacienteDTO registrarPaciente(PacienteRequest request) {
+
+        pacienteRepository.findByDni(request.getDni()).ifPresent(p -> {
             throw new RuntimeException("Ya existe un paciente con ese DNI");
         });
 
-        paciente.setCorreo(paciente.getCorreo());
-        paciente.setFechaNacimiento(paciente.getFechaNacimiento());
-        paciente.setSexo(paciente.getSexo());
-        paciente.setTipoSangre(paciente.getTipoSangre());
-        paciente.setAlergias(paciente.getAlergias());
-        paciente.setContactoEmergencia(paciente.getContactoEmergencia());
-        paciente.setTelefonoEmergencia(paciente.getTelefonoEmergencia());
+        Paciente paciente = PacienteMapper.toEntity(request);
 
-        return pacienteRepository.save(paciente);
+        paciente.setFechaRegistro(java.time.LocalDateTime.now());
+        paciente.setEstado(true);
+
+        Paciente guardado = pacienteRepository.save(paciente);
+
+        return PacienteMapper.toDTO(guardado);
     }
 
     @Override
-    public Paciente actualizarPaciente(Long id, Paciente paciente) {
-        Paciente existente = buscarPorId(id);
+    public PacienteDTO actualizarPaciente(Long id, PacienteRequest request) {
 
-        existente.setNombre(paciente.getNombre());
-        existente.setApellido(paciente.getApellido());
-        existente.setTelefono(paciente.getTelefono());
-        existente.setDireccion(paciente.getDireccion());
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
-        // NUEVOS CAMPOS
-        existente.setCorreo(paciente.getCorreo());
-        existente.setFechaNacimiento(paciente.getFechaNacimiento());
-        existente.setSexo(paciente.getSexo());
-        existente.setTipoSangre(paciente.getTipoSangre());
-        existente.setAlergias(paciente.getAlergias());
-        existente.setContactoEmergencia(paciente.getContactoEmergencia());
-        existente.setTelefonoEmergencia(paciente.getTelefonoEmergencia());
+        PacienteMapper.updateEntity(paciente, request);
 
-        return pacienteRepository.save(existente);
+        Paciente actualizado = pacienteRepository.save(paciente);
+
+        return PacienteMapper.toDTO(actualizado);
     }
 
     @Override
     public void eliminarPaciente(Long id) {
-        Paciente paciente = buscarPorId(id);
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
         paciente.setEstado(false);
         pacienteRepository.save(paciente);
     }
