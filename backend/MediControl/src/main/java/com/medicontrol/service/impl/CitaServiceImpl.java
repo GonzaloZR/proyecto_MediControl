@@ -1,7 +1,11 @@
 package com.medicontrol.service.impl;
 
 import com.medicontrol.model.Cita;
+import com.medicontrol.model.Medico;
+import com.medicontrol.model.Paciente;
 import com.medicontrol.repository.CitaRepository;
+import com.medicontrol.repository.MedicoRepository;
+import com.medicontrol.repository.PacienteRepository;
 import com.medicontrol.service.CitaService;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +16,17 @@ import java.util.List;
 public class CitaServiceImpl implements CitaService {
 
     private final CitaRepository citaRepository;
+    private final PacienteRepository pacienteRepository;
+    private final MedicoRepository medicoRepository;
 
-    public CitaServiceImpl(CitaRepository citaRepository) {
+    public CitaServiceImpl(
+            CitaRepository citaRepository,
+            PacienteRepository pacienteRepository,
+            MedicoRepository medicoRepository
+    ) {
         this.citaRepository = citaRepository;
+        this.pacienteRepository = pacienteRepository;
+        this.medicoRepository = medicoRepository;
     }
 
     @Override
@@ -38,18 +50,24 @@ public class CitaServiceImpl implements CitaService {
             throw new RuntimeException("No se puede registrar una cita en una fecha pasada");
         }
 
-        citaRepository.findByMedicoIdAndFecha(
-                cita.getMedico().getId(),
-                cita.getFecha()
-        ).ifPresent(c -> {
-            throw new RuntimeException("El médico ya tiene una cita registrada en ese horario");
-        });
+        Paciente paciente = pacienteRepository.findById(cita.getPaciente().getId())
+                .filter(p -> Boolean.TRUE.equals(p.getEstado()))
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
 
+        Medico medico = medicoRepository.findById(cita.getMedico().getId())
+                .filter(m -> Boolean.TRUE.equals(m.getEstado()))
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
+
+        citaRepository.findByMedicoIdAndFecha(medico.getId(), cita.getFecha())
+                .ifPresent(c -> {
+                    throw new RuntimeException("El médico ya tiene una cita registrada en ese horario");
+                });
+
+        cita.setPaciente(paciente);
+        cita.setMedico(medico);
         cita.setEstado("PENDIENTE");
         cita.setActivo(true);
         cita.setFechaRegistro(LocalDateTime.now());
-        cita.setDiagnostico(cita.getDiagnostico());
-        cita.setObservaciones(cita.getObservaciones());
 
         return citaRepository.save(cita);
     }
@@ -62,10 +80,18 @@ public class CitaServiceImpl implements CitaService {
             throw new RuntimeException("No se puede reprogramar una cita a una fecha pasada");
         }
 
+        Paciente paciente = pacienteRepository.findById(cita.getPaciente().getId())
+                .filter(p -> Boolean.TRUE.equals(p.getEstado()))
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
+
+        Medico medico = medicoRepository.findById(cita.getMedico().getId())
+                .filter(m -> Boolean.TRUE.equals(m.getEstado()))
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
+
+        existente.setPaciente(paciente);
+        existente.setMedico(medico);
         existente.setFecha(cita.getFecha());
         existente.setMotivo(cita.getMotivo());
-        existente.setMedico(cita.getMedico());
-        existente.setPaciente(cita.getPaciente());
         existente.setDiagnostico(cita.getDiagnostico());
         existente.setObservaciones(cita.getObservaciones());
 
@@ -75,6 +101,11 @@ public class CitaServiceImpl implements CitaService {
     @Override
     public void cancelarCita(Long id) {
         Cita cita = buscarPorId(id);
+
+        if ("ATENDIDA".equalsIgnoreCase(cita.getEstado())) {
+            throw new RuntimeException("No se puede cancelar una cita ya atendida");
+        }
+
         cita.setEstado("CANCELADA");
         cita.setActivo(false);
         citaRepository.save(cita);
