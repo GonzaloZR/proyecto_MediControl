@@ -48,6 +48,8 @@ public class CitaServiceImpl implements CitaService {
         cita.setEstado("PENDIENTE");
         cita.setActivo(true);
         cita.setFechaRegistro(LocalDateTime.now());
+        cita.setDiagnostico(cita.getDiagnostico());
+        cita.setObservaciones(cita.getObservaciones());
 
         return citaRepository.save(cita);
     }
@@ -64,6 +66,8 @@ public class CitaServiceImpl implements CitaService {
         existente.setMotivo(cita.getMotivo());
         existente.setMedico(cita.getMedico());
         existente.setPaciente(cita.getPaciente());
+        existente.setDiagnostico(cita.getDiagnostico());
+        existente.setObservaciones(cita.getObservaciones());
 
         return citaRepository.save(existente);
     }

@@ -35,6 +35,7 @@ public class MedicoServiceImpl implements MedicoService {
     @Override
     public Medico registrarMedico(Medico medico) {
         medico.setFechaRegistro(LocalDateTime.now());
+        medico.setNumeroColegiatura(medico.getNumeroColegiatura());
         medico.setEstado(true);
 
         return medicoRepository.save(medico);
@@ -49,6 +50,7 @@ public class MedicoServiceImpl implements MedicoService {
         existente.setTelefono(medico.getTelefono());
         existente.setCorreo(medico.getCorreo());
         existente.setEspecialidad(medico.getEspecialidad());
+        existente.setNumeroColegiatura(medico.getNumeroColegiatura());
 
         return medicoRepository.save(existente);
     }

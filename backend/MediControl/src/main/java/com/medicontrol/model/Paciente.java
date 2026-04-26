@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -17,8 +20,29 @@ public class Paciente extends Persona {
     @Column(length = 255)
     private String direccion;
 
-    @Column(name = "fecha_registro")
-    private java.time.LocalDateTime fechaRegistro;
+    @Column(length = 120, unique = true)
+    private String correo;
+
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
+
+    @Column(length = 20)
+    private String sexo;
+
+    @Column(name = "tipo_sangre", length = 10)
+    private String tipoSangre;
+
+    @Column(length = 255)
+    private String alergias;
+
+    @Column(name = "contacto_emergencia", length = 120)
+    private String contactoEmergencia;
+
+    @Column(name = "telefono_emergencia", length = 20)
+    private String telefonoEmergencia;
+
+    @Column(name = "fecha_registro", insertable = false, updatable = false)
+    private LocalDateTime fechaRegistro;
 
     @Column
     private Boolean estado = true;

@@ -40,4 +40,10 @@ public class Cita {
 
     @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
+
+    @Column(length = 255)
+    private String diagnostico;
+
+    @Column(length = 255)
+    private String observaciones;
 }

@@ -17,6 +17,9 @@ public class Medico extends Persona {
     @Column(length = 120, unique = true)
     private String correo;
 
+    @Column(name = "numero_colegiatura", length = 50, unique = true)
+    private String numeroColegiatura;
+
     @Column(name = "fecha_registro")
     private java.time.LocalDateTime fechaRegistro;
 
@@ -31,4 +34,6 @@ public class Medico extends Persona {
     public String obtenerTipoPersona() {
         return "Médico";
     }
+
+
 }

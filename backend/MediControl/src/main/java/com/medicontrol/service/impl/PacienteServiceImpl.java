@@ -38,22 +38,36 @@ public class PacienteServiceImpl implements PacienteService {
             throw new RuntimeException("Ya existe un paciente con ese DNI");
         });
 
-        paciente.setFechaRegistro(LocalDateTime.now());
-        paciente.setEstado(true);
+        paciente.setCorreo(paciente.getCorreo());
+        paciente.setFechaNacimiento(paciente.getFechaNacimiento());
+        paciente.setSexo(paciente.getSexo());
+        paciente.setTipoSangre(paciente.getTipoSangre());
+        paciente.setAlergias(paciente.getAlergias());
+        paciente.setContactoEmergencia(paciente.getContactoEmergencia());
+        paciente.setTelefonoEmergencia(paciente.getTelefonoEmergencia());
 
         return pacienteRepository.save(paciente);
     }
 
     @Override
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
-        Paciente pacienteExistente = buscarPorId(id);
+        Paciente existente = buscarPorId(id);
 
-        pacienteExistente.setNombre(paciente.getNombre());
-        pacienteExistente.setApellido(paciente.getApellido());
-        pacienteExistente.setTelefono(paciente.getTelefono());
-        pacienteExistente.setDireccion(paciente.getDireccion());
+        existente.setNombre(paciente.getNombre());
+        existente.setApellido(paciente.getApellido());
+        existente.setTelefono(paciente.getTelefono());
+        existente.setDireccion(paciente.getDireccion());
 
-        return pacienteRepository.save(pacienteExistente);
+        // NUEVOS CAMPOS
+        existente.setCorreo(paciente.getCorreo());
+        existente.setFechaNacimiento(paciente.getFechaNacimiento());
+        existente.setSexo(paciente.getSexo());
+        existente.setTipoSangre(paciente.getTipoSangre());
+        existente.setAlergias(paciente.getAlergias());
+        existente.setContactoEmergencia(paciente.getContactoEmergencia());
+        existente.setTelefonoEmergencia(paciente.getTelefonoEmergencia());
+
+        return pacienteRepository.save(existente);
     }
 
     @Override

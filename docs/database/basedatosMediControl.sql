@@ -37,7 +37,7 @@ CREATE TABLE especialidades (
 );
 
 -- =========================
--- TABLA PACIENTES
+-- TABLA PACIENTES (ACTUALIZADA)
 -- =========================
 CREATE TABLE pacientes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -45,13 +45,20 @@ CREATE TABLE pacientes (
     apellido VARCHAR(100) NOT NULL,
     dni VARCHAR(15) NOT NULL UNIQUE,
     telefono VARCHAR(20),
+    correo VARCHAR(120) UNIQUE,
     direccion VARCHAR(255),
+    fecha_nacimiento DATE,
+    sexo VARCHAR(20),
+    tipo_sangre VARCHAR(10),
+    alergias VARCHAR(255),
+    contacto_emergencia VARCHAR(120),
+    telefono_emergencia VARCHAR(20),
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
 );
 
 -- =========================
--- TABLA MEDICOS
+-- TABLA MEDICOS (ACTUALIZADA)
 -- =========================
 CREATE TABLE medicos (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -60,6 +67,7 @@ CREATE TABLE medicos (
     dni VARCHAR(15) NOT NULL UNIQUE,
     telefono VARCHAR(20),
     correo VARCHAR(120) UNIQUE,
+    numero_colegiatura VARCHAR(50) UNIQUE,
     especialidad_id BIGINT NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE,
@@ -68,7 +76,7 @@ CREATE TABLE medicos (
 );
 
 -- =========================
--- TABLA CITAS
+-- TABLA CITAS (ACTUALIZADA)
 -- =========================
 CREATE TABLE citas (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -77,6 +85,8 @@ CREATE TABLE citas (
     fecha DATETIME NOT NULL,
     motivo VARCHAR(255) NOT NULL,
     estado VARCHAR(50) DEFAULT 'PENDIENTE',
+    diagnostico VARCHAR(255),
+    observaciones VARCHAR(255),
     activo BOOLEAN DEFAULT TRUE,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -99,7 +109,6 @@ INSERT INTO especialidades (nombre, descripcion) VALUES
 ('Pediatría', 'Atención médica para niños'),
 ('Cardiología', 'Atención de enfermedades del corazón');
 
--- Contraseña temporal: admin123
--- Luego en Spring Boot la guardaremos encriptada con BCrypt
+-- Usuario inicial (luego se encriptará desde backend)
 INSERT INTO usuarios (username, password, correo, rol_id) VALUES
 ('admin', 'admin123', 'admin@medicontrol.com', 1);
