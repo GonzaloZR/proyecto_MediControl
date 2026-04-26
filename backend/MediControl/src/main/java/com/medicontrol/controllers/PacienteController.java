@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+
 import java.util.List;
 
 @RestController
@@ -27,10 +28,10 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO')")
     public PacienteDTO buscarPorId(@PathVariable Long id) {
         return pacienteService.buscarPorId(id);
-    }
+    }   
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")

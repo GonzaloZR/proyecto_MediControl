@@ -3,6 +3,7 @@ package com.medicontrol.controllers;
 import com.medicontrol.model.Cita;
 import com.medicontrol.service.CitaService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -14,30 +15,36 @@ public class CitaController {
     private final CitaService citaService;
 
     public CitaController(CitaService citaService) {
+
         this.citaService = citaService;
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO')")
     public List<Cita> listarCitas() {
         return citaService.listarCitas();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO')")
     public Cita buscarPorId(@PathVariable Long id) {
         return citaService.buscarPorId(id);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'PACIENTE')")
     public Cita registrarCita(@RequestBody Cita cita) {
         return citaService.registrarCita(cita);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO')")
     public Cita actualizarCita(@PathVariable Long id, @RequestBody Cita cita) {
         return citaService.actualizarCita(id, cita);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
     public void cancelarCita(@PathVariable Long id) {
         citaService.cancelarCita(id);
     }
