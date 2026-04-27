@@ -1,4 +1,4 @@
-package com.medicontrol.dto;
+package com.medicontrol.dto.auth;
 
 import lombok.Getter;
 import lombok.Setter;

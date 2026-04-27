@@ -41,6 +41,7 @@ CREATE TABLE especialidades (
 -- =========================
 CREATE TABLE pacientes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id BIGINT UNIQUE,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     dni VARCHAR(15) NOT NULL UNIQUE,
@@ -54,7 +55,9 @@ CREATE TABLE pacientes (
     contacto_emergencia VARCHAR(120),
     telefono_emergencia VARCHAR(20),
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    estado BOOLEAN DEFAULT TRUE
+    estado BOOLEAN DEFAULT TRUE,
+
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
 -- =========================
@@ -112,3 +115,14 @@ INSERT INTO especialidades (nombre, descripcion) VALUES
 -- Usuario inicial (luego se encriptará desde backend)
 INSERT INTO usuarios (username, password, correo, rol_id) VALUES
 ('admin', 'admin123', 'admin@medicontrol.com', 1);
+
+
+INSERT INTO roles (nombre, descripcion) VALUES
+('PACIENTE', 'Usuario final que agenda citas');
+
+ALTER TABLE pacientes
+ADD usuario_id BIGINT UNIQUE;
+
+ALTER TABLE pacientes
+ADD CONSTRAINT fk_paciente_usuario
+FOREIGN KEY (usuario_id) REFERENCES usuarios(id);

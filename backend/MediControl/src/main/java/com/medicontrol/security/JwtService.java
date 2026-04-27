@@ -33,6 +33,10 @@ public class JwtService {
         return obtenerClaims(token).getSubject();
     }
 
+    public String extraerUsername(String token) {
+        return obtenerUsername(token);
+    }
+
     public boolean tokenValido(String token) {
         try {
             obtenerClaims(token);

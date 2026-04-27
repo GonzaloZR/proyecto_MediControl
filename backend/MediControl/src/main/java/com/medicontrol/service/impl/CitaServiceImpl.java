@@ -65,7 +65,7 @@ public class CitaServiceImpl implements CitaService {
 
         cita.setPaciente(paciente);
         cita.setMedico(medico);
-        cita.setEstado("PENDIENTE");
+        cita.setEstado("SOLICITADA");
         cita.setActivo(true);
         cita.setFechaRegistro(LocalDateTime.now());
 
@@ -109,5 +109,69 @@ public class CitaServiceImpl implements CitaService {
         cita.setEstado("CANCELADA");
         cita.setActivo(false);
         citaRepository.save(cita);
+    }
+
+    @Override
+    public List<Cita> listarCitasPorPaciente(Long pacienteId) {
+
+        return citaRepository.findByPacienteIdAndActivoTrue(pacienteId);
+    }
+
+    @Override
+    public Cita confirmarCita(Long id) {
+
+        Cita cita = buscarPorId(id);
+
+        if (!"SOLICITADA".equalsIgnoreCase(cita.getEstado())) {
+            throw new RuntimeException("Solo se pueden confirmar citas solicitadas");
+        }
+
+        cita.setEstado("CONFIRMADA");
+
+        return citaRepository.save(cita);
+    }
+
+    @Override
+    public Cita marcarEnCurso(Long id) {
+
+        Cita cita = buscarPorId(id);
+
+        if (!"CONFIRMADA".equalsIgnoreCase(cita.getEstado())) {
+            throw new RuntimeException("Solo citas confirmadas pueden pasar a EN_CURSO");
+        }
+
+        cita.setEstado("EN_CURSO");
+
+        return citaRepository.save(cita);
+    }
+
+    @Override
+    public Cita marcarAtendida(Long id, String diagnostico, String observaciones) {
+
+        Cita cita = buscarPorId(id);
+
+        if (!"EN_CURSO".equalsIgnoreCase(cita.getEstado())) {
+            throw new RuntimeException("Solo citas en curso pueden marcarse como atendidas");
+        }
+
+        cita.setDiagnostico(diagnostico);
+        cita.setObservaciones(observaciones);
+        cita.setEstado("ATENDIDA");
+
+        return citaRepository.save(cita);
+    }
+
+    @Override
+    public Cita rechazarCita(Long id) {
+
+        Cita cita = buscarPorId(id);
+
+        if (!"SOLICITADA".equalsIgnoreCase(cita.getEstado())) {
+            throw new RuntimeException("Solo se pueden rechazar citas solicitadas");
+        }
+
+        cita.setEstado("RECHAZADA");
+
+        return citaRepository.save(cita);
     }
 }

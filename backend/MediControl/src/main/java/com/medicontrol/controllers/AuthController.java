@@ -1,10 +1,11 @@
 package com.medicontrol.controllers;
 
-import com.medicontrol.dto.AuthResponse;
-import com.medicontrol.dto.LoginRequest;
-import com.medicontrol.dto.RegisterRequest;
+import com.medicontrol.dto.auth.AuthResponse;
+import com.medicontrol.dto.auth.LoginRequest;
+import com.medicontrol.dto.auth.RegisterRequest;
 import com.medicontrol.service.AuthService;
 import org.springframework.web.bind.annotation.*;
+import com.medicontrol.dto.paciente.PacienteRegisterRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,5 +29,10 @@ public class AuthController {
     public AuthResponse login(@RequestBody LoginRequest request) {
 
         return authService.login(request);
+    }
+
+    @PostMapping("/register-paciente")
+    public AuthResponse registerPaciente(@RequestBody PacienteRegisterRequest request) {
+        return authService.registerPaciente(request);
     }
 }

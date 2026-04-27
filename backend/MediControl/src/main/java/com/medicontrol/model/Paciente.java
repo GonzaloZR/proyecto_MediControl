@@ -47,6 +47,10 @@ public class Paciente extends Persona {
     @Column
     private Boolean estado = true;
 
+    @OneToOne
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
+
     @Override
     public String obtenerTipoPersona() {
         return "Paciente";

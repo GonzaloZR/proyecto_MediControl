@@ -15,4 +15,14 @@ public interface CitaService {
     Cita actualizarCita(Long id, Cita cita);
 
     void cancelarCita(Long id);
+
+    List<Cita> listarCitasPorPaciente(Long pacienteId);
+
+    Cita confirmarCita(Long id);
+
+    Cita marcarEnCurso(Long id);
+
+    Cita marcarAtendida(Long id, String diagnostico, String observaciones);
+
+    Cita rechazarCita(Long id);
 }
