@@ -3,18 +3,18 @@ package com.medicontrol.service.impl;
 import com.medicontrol.dto.auth.AuthResponse;
 import com.medicontrol.dto.auth.LoginRequest;
 import com.medicontrol.dto.auth.RegisterRequest;
+import com.medicontrol.model.Paciente;
 import com.medicontrol.model.Rol;
 import com.medicontrol.model.Usuario;
+import com.medicontrol.repository.PacienteRepository;
 import com.medicontrol.repository.RolRepository;
 import com.medicontrol.repository.UsuarioRepository;
 import com.medicontrol.security.JwtService;
 import com.medicontrol.service.AuthService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.medicontrol.dto.paciente.PacienteRegisterRequest;
-import com.medicontrol.model.Paciente;
-import com.medicontrol.repository.PacienteRepository;
-
 
 import java.time.LocalDateTime;
 
@@ -26,7 +26,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final PacienteRepository pacienteRepository;
-
 
     public AuthServiceImpl(
             UsuarioRepository usuarioRepository,
@@ -103,17 +102,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponse registerPaciente(PacienteRegisterRequest request) {
-
         usuarioRepository.findByUsername(request.getUsername()).ifPresent(u -> {
             throw new RuntimeException("El usuario ya existe");
+        });
+
+        usuarioRepository.findByCorreo(request.getCorreo()).ifPresent(u -> {
+            throw new RuntimeException("El correo ya está registrado");
         });
 
         pacienteRepository.findByDni(request.getDni()).ifPresent(p -> {
             throw new RuntimeException("Ya existe un paciente con ese DNI");
         });
 
-        Rol rolPaciente = rolRepository.findById(4L)
+        Rol rolPaciente = rolRepository.findByNombre("PACIENTE")
                 .orElseThrow(() -> new RuntimeException("Rol PACIENTE no encontrado"));
 
         Usuario usuario = new Usuario();
@@ -157,6 +160,4 @@ public class AuthServiceImpl implements AuthService {
                 pacienteGuardado.getId()
         );
     }
-
-
 }

@@ -45,6 +45,20 @@ public class EspecialidadController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void eliminarEspecialidad(@PathVariable Long id) {
+
         especialidadService.eliminarEspecialidad(id);
+    }
+
+    @GetMapping("/todas")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO')")
+    public List<Especialidad> listarTodas() {
+
+        return especialidadService.listarTodas();
+    }
+
+    @PutMapping("/{id}/activar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Especialidad activarEspecialidad(@PathVariable Long id) {
+        return especialidadService.activarEspecialidad(id);
     }
 }

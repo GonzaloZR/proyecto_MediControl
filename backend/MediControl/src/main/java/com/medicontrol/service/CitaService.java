@@ -18,6 +18,8 @@ public interface CitaService {
 
     List<Cita> listarCitasPorPaciente(Long pacienteId);
 
+    List<Cita> listarCitasPorMedico(String username);
+
     Cita confirmarCita(Long id);
 
     Cita marcarEnCurso(Long id);
@@ -25,4 +27,6 @@ public interface CitaService {
     Cita marcarAtendida(Long id, String diagnostico, String observaciones);
 
     Cita rechazarCita(Long id);
+
+    void validarHorarioCita(Cita cita);
 }

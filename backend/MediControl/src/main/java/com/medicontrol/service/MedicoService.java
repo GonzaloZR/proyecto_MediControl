@@ -15,4 +15,12 @@ public interface MedicoService {
     Medico actualizarMedico(Long id, Medico medico);
 
     void eliminarMedico(Long id);
+
+    List<Medico> listarTodos();
+
+    Medico activarMedico(Long id);
+
+    Medico registrarMedicoConUsuario(com.medicontrol.dto.medico.MedicoRegistroDTO dto);
+
+
 }

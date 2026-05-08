@@ -8,6 +8,8 @@ import com.medicontrol.repository.MedicoRepository;
 import com.medicontrol.repository.PacienteRepository;
 import com.medicontrol.service.CitaService;
 import org.springframework.stereotype.Service;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,9 +48,8 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public Cita registrarCita(Cita cita) {
-        if (cita.getFecha().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("No se puede registrar una cita en una fecha pasada");
-        }
+
+        validarHorarioCita(cita);
 
         Paciente paciente = pacienteRepository.findById(cita.getPaciente().getId())
                 .filter(p -> Boolean.TRUE.equals(p.getEstado()))
@@ -74,11 +75,10 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public Cita actualizarCita(Long id, Cita cita) {
+
         Cita existente = buscarPorId(id);
 
-        if (cita.getFecha().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("No se puede reprogramar una cita a una fecha pasada");
-        }
+        validarHorarioCita(cita);
 
         Paciente paciente = pacienteRepository.findById(cita.getPaciente().getId())
                 .filter(p -> Boolean.TRUE.equals(p.getEstado()))
@@ -87,6 +87,13 @@ public class CitaServiceImpl implements CitaService {
         Medico medico = medicoRepository.findById(cita.getMedico().getId())
                 .filter(m -> Boolean.TRUE.equals(m.getEstado()))
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
+
+        citaRepository.findByMedicoIdAndFecha(medico.getId(), cita.getFecha())
+                .ifPresent(citaEncontrada -> {
+                    if (!citaEncontrada.getId().equals(id)) {
+                        throw new RuntimeException("El médico ya tiene una cita registrada en ese horario");
+                    }
+                });
 
         existente.setPaciente(paciente);
         existente.setMedico(medico);
@@ -115,6 +122,24 @@ public class CitaServiceImpl implements CitaService {
     public List<Cita> listarCitasPorPaciente(Long pacienteId) {
 
         return citaRepository.findByPacienteIdAndActivoTrue(pacienteId);
+    }
+
+    @Override
+    public List<Cita> listarCitasPorMedico(String username) {
+
+        Medico medico = medicoRepository
+                .findByUsuarioUsername(username)
+                .orElseThrow(() ->
+                        new RuntimeException("Médico no encontrado"));
+
+        return citaRepository.findAll()
+                .stream()
+                .filter(cita ->
+                        cita.getMedico() != null &&
+                                cita.getMedico().getId().equals(medico.getId()) &&
+                                Boolean.TRUE.equals(cita.getActivo())
+                )
+                .toList();
     }
 
     @Override
@@ -173,5 +198,35 @@ public class CitaServiceImpl implements CitaService {
         cita.setEstado("RECHAZADA");
 
         return citaRepository.save(cita);
+    }
+
+    @Override
+    public void validarHorarioCita(Cita cita) {
+
+        LocalDateTime fechaCita = cita.getFecha();
+
+        // Validar fecha pasada
+        if (fechaCita.isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("No se puede registrar una cita en una fecha pasada");
+        }
+
+        // Validar domingo
+        DayOfWeek dia = fechaCita.getDayOfWeek();
+
+        if (dia == DayOfWeek.SUNDAY) {
+            throw new RuntimeException("No se atienden citas los domingos");
+        }
+
+        // Validar horario
+        LocalTime hora = fechaCita.toLocalTime();
+
+        LocalTime horaInicio = LocalTime.of(8, 0);
+        LocalTime horaFin = LocalTime.of(18, 0);
+
+        if (hora.isBefore(horaInicio) || hora.isAfter(horaFin)) {
+            throw new RuntimeException(
+                    "Horario no disponible. Atención de lunes a sábado de 08:00 a 18:00"
+            );
+        }
     }
 }

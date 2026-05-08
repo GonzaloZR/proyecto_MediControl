@@ -26,14 +26,18 @@ public class Medico extends Persona {
     @Column
     private Boolean estado = true;
 
+    // Relación con especialidad
     @ManyToOne
     @JoinColumn(name = "especialidad_id", nullable = false)
     private Especialidad especialidad;
+
+    // Relación con usuario login
+    @OneToOne
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
 
     @Override
     public String obtenerTipoPersona() {
         return "Médico";
     }
-
-
 }
