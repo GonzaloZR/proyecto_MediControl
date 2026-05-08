@@ -4,6 +4,7 @@ import com.medicontrol.model.Medico;
 import com.medicontrol.service.MedicoService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.medicontrol.dto.medico.MedicoRegistroDTO;
 
 import java.util.List;
 
@@ -47,4 +48,24 @@ public class MedicoController {
     public void eliminarMedico(@PathVariable Long id) {
         medicoService.eliminarMedico(id);
     }
+
+    @PostMapping("/registrar-con-usuario")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Medico registrarMedicoConUsuario(@RequestBody MedicoRegistroDTO dto) {
+        return medicoService.registrarMedicoConUsuario(dto);
+    }
+
+    @GetMapping("/todos")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
+    public List<Medico> listarTodos() {
+        return medicoService.listarTodos();
+    }
+
+    @PutMapping("/{id}/activar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Medico activarMedico(@PathVariable Long id) {
+        return medicoService.activarMedico(id);
+    }
+
+
 }

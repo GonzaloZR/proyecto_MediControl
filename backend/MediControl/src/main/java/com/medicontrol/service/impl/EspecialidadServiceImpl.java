@@ -53,4 +53,19 @@ public class EspecialidadServiceImpl implements EspecialidadService {
         especialidad.setEstado(false);
         especialidadRepository.save(especialidad);
     }
+
+    @Override
+    public List<Especialidad> listarTodas() {
+        return especialidadRepository.findAll();
+    }
+
+    @Override
+    public Especialidad activarEspecialidad(Long id) {
+        Especialidad especialidad = especialidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada"));
+
+        especialidad.setEstado(true);
+
+        return especialidadRepository.save(especialidad);
+    }
 }

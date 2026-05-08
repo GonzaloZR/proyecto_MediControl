@@ -15,4 +15,8 @@ public interface EspecialidadService {
     Especialidad actualizarEspecialidad(Long id, Especialidad especialidad);
 
     void eliminarEspecialidad(Long id);
+
+    List<Especialidad> listarTodas();
+
+    Especialidad activarEspecialidad(Long id);
 }

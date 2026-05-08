@@ -69,6 +69,43 @@ public class PacienteServiceImpl implements PacienteService {
     }
 
     @Override
+    public Paciente obtenerMiPerfil(String username) {
+        return pacienteRepository.findByUsuarioUsername(username)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado para el usuario logueado"));
+    }
+
+    @Override
+    public Paciente actualizarMiPerfil(String username, Paciente paciente) {
+        Paciente existente = pacienteRepository.findByUsuarioUsername(username)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado para el usuario logueado"));
+
+        existente.setTelefono(paciente.getTelefono());
+        existente.setCorreo(paciente.getCorreo());
+        existente.setDireccion(paciente.getDireccion());
+        existente.setTipoSangre(paciente.getTipoSangre());
+        existente.setAlergias(paciente.getAlergias());
+        existente.setContactoEmergencia(paciente.getContactoEmergencia());
+        existente.setTelefonoEmergencia(paciente.getTelefonoEmergencia());
+
+        return pacienteRepository.save(existente);
+    }
+
+    @Override
+    public List<Paciente> listarTodos() {
+        return pacienteRepository.findAll();
+    }
+
+    @Override
+    public Paciente activarPaciente(Long id) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
+        paciente.setEstado(true);
+
+        return pacienteRepository.save(paciente);
+    }
+
+    @Override
     public void eliminarPaciente(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));

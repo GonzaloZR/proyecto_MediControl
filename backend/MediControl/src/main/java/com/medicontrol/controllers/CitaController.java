@@ -7,10 +7,12 @@ import com.medicontrol.repository.PacienteRepository;
 import com.medicontrol.repository.UsuarioRepository;
 import com.medicontrol.security.JwtService;
 import com.medicontrol.service.CitaService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.medicontrol.dto.cita.AtencionRequest;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -129,4 +131,16 @@ public class CitaController {
         return citaService.rechazarCita(id);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+    @GetMapping("/mis-citas-medico")
+    public ResponseEntity<List<Cita>> listarMisCitasMedico(
+            Authentication authentication
+    ) {
+
+        String username = authentication.getName();
+
+        return ResponseEntity.ok(
+                citaService.listarCitasPorMedico(username)
+        );
+    }
 }
