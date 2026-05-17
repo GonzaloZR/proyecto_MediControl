@@ -1064,7 +1064,7 @@ function Dashboard() {
 
           </section>
 
-        )}@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'MEDICO', 'PACIENTE')")
+        )}
 
         {rol === "RECEPCIONISTA" && (
 
